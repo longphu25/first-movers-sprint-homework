@@ -1,4 +1,5 @@
 # NFT Pass - Soulbound NFT System
+
 # Hệ thống NFT Pass Soulbound
 
 ```sh
@@ -26,6 +27,7 @@ sui client addresses
 # sui client switch --address <địa_chỉ_ví_mới>
 sui client switch --address 0x70b56e23fff713cc617cc8e14f3c947e9ee9ced42547fcd952b69df4bee32f70
 sui client addresses
+sui client balance
 ```
 
 ```sh
@@ -76,6 +78,7 @@ sui client object $REGISTRY_ID
 ```sh {"terminalRows":"15"}
 # Mint NFT Pass cho địa chỉ hiện tại
 # Mỗi địa chỉ chỉ được mint 1 lần (soulbound)
+echo "Package ID: $PACKAGE_ID"
 sui client call \
   --package $PACKAGE_ID \
   --module nft_pass \
@@ -110,6 +113,49 @@ sui client call \
   --function mint \
   --args $REGISTRY_ID \
   --gas-budget 10000000
+```
+
+```sh
+# Tất cả các ví addresses
+sui client addresses
+```
+
+```sh
+# Đổi ví active sang ví khác
+# sui client switch --address <địa_chỉ_ví_mới>
+sui client switch --address 0xdfdd6484f7f94c80daefbfee06728f60236fde6bc229e30453306166a6b5691e
+sui client addresses
+sui client balance
+```
+
+```sh
+# Mint NFT Pass cho địa chỉ hiện tại - ví 2
+# Mỗi địa chỉ chỉ được mint 1 lần (soulbound)
+echo "Package ID: $PACKAGE_ID"
+sui client active-address
+sui client call \
+  --package $PACKAGE_ID \
+  --module nft_pass \
+  --function mint \
+  --args $REGISTRY_ID \
+  --gas-budget 10000000 | tee pass.mint2.txt
+```
+
+```sh
+# Lấy PASS_ID từ file pass.mint2.txt
+export PASS_ID_2=$(grep -B 3 "ObjectType:.*::nft_pass::Pass" pass.mint2.txt | grep "ObjectID:" | awk '{print $4}')
+echo "Pass ID: $PASS_ID_2"
+```
+
+```sh {"terminalRows":"29"}
+# Tất cả các ví addresses
+sui client addresses
+# Xem thông tin Pass object của ví 
+sui client object $PASS_ID
+# Xem thông tin Pass object của ví 2
+sui client object $PASS_ID_2
+# Xem lại MintRegistry để kiểm tra địa chỉ đã được ghi nhận
+sui client object $REGISTRY_ID
 ```
 
 ```sh
